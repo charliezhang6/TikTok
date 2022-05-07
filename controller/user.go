@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"TikTok/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync/atomic"
+	"time"
 )
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
@@ -35,8 +37,8 @@ type UserResponse struct {
 func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
-
-	token := username + password
+	salt := time.Now().Unix()
+	token := util.MD5(password, salt)
 
 	if _, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
