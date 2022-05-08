@@ -68,7 +68,10 @@ func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	if result, _ := redis.Get(token); result != nil {
 		var user User
-		util.DefaultTranscoder.Unmarshal(result.([]byte), user)
+		err := util.DefaultTranscoder.Unmarshal(result.([]byte), user)
+		if err != nil {
+			return
+		}
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
 			User:     user,
