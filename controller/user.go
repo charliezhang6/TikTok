@@ -41,10 +41,9 @@ func Register(c *gin.Context) {
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-		//注册
 		userId, token, err := service.RegisterUser(username, password)
 		if err != nil {
-			c.JSON(http.StatusBadGateway, UserLoginResponse{
+			c.JSON(http.StatusInternalServerError, UserLoginResponse{
 				Response: Response{StatusCode: -1, StatusMsg: "用户注册失败"},
 			})
 		}
