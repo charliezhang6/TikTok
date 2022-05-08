@@ -5,12 +5,12 @@ import (
 	"log"
 )
 
-func GenSonyflake() uint64 {
+func GenSonyflake() int64 {
 
 	flake := sonyflake.NewSonyflake(sonyflake.Settings{})
 	id, err := flake.NextID()
 	if err != nil {
 		log.Fatalf("flake.NextID() failed with %s\n", err)
 	}
-	return id
+	return int64(id)
 }

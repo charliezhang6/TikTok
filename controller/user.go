@@ -4,7 +4,6 @@ import (
 	"TikTok/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sync/atomic"
 	"time"
 )
 
@@ -45,9 +44,9 @@ func Register(c *gin.Context) {
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-		atomic.AddInt64(&userIdSequence, 1)
+		userId := util.GenSonyflake()
 		newUser := User{
-			Id:   userIdSequence,
+			Id:   userId,
 			Name: username,
 		}
 		usersLoginInfo[token] = newUser
