@@ -33,3 +33,13 @@ func (*UserDao) AddUser(user User) error {
 	}
 	return nil
 }
+
+func (*UserDao) SelectByName(name string) (*User, error) {
+	var user User
+	err := db.Where("user_name=", name).First(&user).Error
+	if err != nil {
+		log.Fatal("查询用户失败" + err.Error())
+		return nil, err
+	}
+	return &user, nil
+}

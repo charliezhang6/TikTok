@@ -2,10 +2,8 @@ package controller
 
 import (
 	"TikTok/repository"
-	"TikTok/util"
+	"TikTok/service"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
-	"log"
 	"net/http"
 )
 
@@ -36,30 +34,19 @@ type UserResponse struct {
 func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
-	token := username + password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println(err)
-	}
 
-	if _, exist := usersLoginInfo[token]; exist {
+	if exist, _ := repository.NewUserDaoInstance().SelectByName(username); exist != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-		userId := util.GenSonyflake()
-		newUser := User{
-			Id:   userId,
-			Name: username,
-		}
-		user := repository.User{ID: userId, Name: username, Password: string(hashedPassword)}
-		err := repository.NewUserDaoInstance().AddUser(user)
+		//注册
+		userId, token, err := service.RegisterUser(username, password)
 		if err != nil {
 			c.JSON(http.StatusBadGateway, UserLoginResponse{
 				Response: Response{StatusCode: -1, StatusMsg: "用户注册失败"},
 			})
 		}
-		usersLoginInfo[token] = newUser
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   userId,
