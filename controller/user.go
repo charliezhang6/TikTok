@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
 	"github.com/gin-gonic/gin"
@@ -76,11 +77,10 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-
-	if user, exist := usersLoginInfo[token]; exist {
+	if user, err := redis.Get(token); err == nil {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
-			User:     user,
+			User:     user.(User),
 		})
 	} else {
 		c.JSON(http.StatusOK, UserResponse{
