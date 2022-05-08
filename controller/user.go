@@ -41,6 +41,7 @@ func Register(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
+
 	if _, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},

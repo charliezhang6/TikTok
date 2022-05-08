@@ -1,7 +1,7 @@
 package main
 
 import (
-	"TikTok/controller/redis"
+	"TikTok/redis"
 	"TikTok/repository"
 	"github.com/gin-gonic/gin"
 	"log"
