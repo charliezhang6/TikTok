@@ -4,8 +4,9 @@ import (
 	"TikTok/repository"
 	"TikTok/util"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 	"net/http"
-	"time"
 )
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
@@ -36,9 +37,10 @@ func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 	token := username + password
-	salt := string(time.Now().Unix())
-	password = util.MD5(password, salt)
-
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println(err)
+	}
 	if _, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
@@ -49,7 +51,7 @@ func Register(c *gin.Context) {
 			Id:   userId,
 			Name: username,
 		}
-		user := repository.User{ID: userId, Name: username, Password: password, Salt: salt, Token: token}
+		user := repository.User{ID: userId, Name: username, Password: string(hashedPassword)}
 		err := repository.NewUserDaoInstance().AddUser(user)
 		if err != nil {
 			c.JSON(http.StatusBadGateway, UserLoginResponse{
