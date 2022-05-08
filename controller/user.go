@@ -4,6 +4,7 @@ import (
 	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
+	"TikTok/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -19,17 +20,6 @@ var usersLoginInfo = map[string]User{
 		FollowerCount: 5,
 		IsFollow:      true,
 	},
-}
-
-type UserLoginResponse struct {
-	Response
-	UserId int64  `json:"user_id,omitempty"`
-	Token  string `json:"token"`
-}
-
-type UserResponse struct {
-	Response
-	User User `json:"user"`
 }
 
 func Register(c *gin.Context) {
@@ -76,10 +66,12 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-	if user, err := redis.Get(token); err == nil {
+	if result, _ := redis.Get(token); result != nil {
+		var user User
+		util.DefaultTranscoder.Unmarshal(result.([]byte), user)
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
-			User:     user.(User),
+			User:     user,
 		})
 	} else {
 		c.JSON(http.StatusOK, UserResponse{
