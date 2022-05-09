@@ -4,7 +4,6 @@ import (
 	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
-	"TikTok/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -66,12 +65,8 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-	if result, _ := redis.Get(token); result != nil {
-		var user User
-		err := util.DefaultTranscoder.Unmarshal(result.([]byte), user)
-		if err != nil {
-			return
-		}
+	var user User
+	if err := redis.Get(token, &user); err == nil {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
 			User:     user,
