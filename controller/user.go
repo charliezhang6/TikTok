@@ -66,7 +66,13 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	var user User
-	if err := redis.Get(token, &user); err == nil {
+	err := redis.Get(token, &user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, UserResponse{
+			Response: Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
+		})
+	}
+	if user.Id != 0 {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
 			User:     user,

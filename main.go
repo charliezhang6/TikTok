@@ -15,9 +15,10 @@ func main() {
 	if err != nil {
 		log.Fatal("数据库连接失败")
 	}
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 	err = redis.InitRedis()
 	if err != nil {
 		log.Fatal("Redis连接失败")
 	}
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+
 }

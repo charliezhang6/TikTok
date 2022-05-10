@@ -1,6 +1,9 @@
 package redis
 
-import "TikTok/util"
+import (
+	"TikTok/util"
+	"log"
+)
 
 func Set(key string, value interface{}, expireTime int64) (err error) {
 	redisValue, _ := util.DefaultTranscoder.Marshal(value)
@@ -14,6 +17,9 @@ func Set(key string, value interface{}, expireTime int64) (err error) {
 
 func Get(key string, value interface{}) error {
 	redisValue, err := Client.Get(key).Result()
+	if err != nil {
+		log.Fatal("查询redis失败")
+	}
 	err = util.DefaultTranscoder.Unmarshal([]byte(redisValue), &value)
 	return err
 }
