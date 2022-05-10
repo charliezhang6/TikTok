@@ -1,6 +1,7 @@
 package main
 
 import (
+	"TikTok/config"
 	"TikTok/redis"
 	"TikTok/repository"
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 )
 
 func main() {
+	config.InitConfig()
 	r := gin.Default()
 
 	initRouter(r)

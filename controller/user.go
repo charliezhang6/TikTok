@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"TikTok/config"
 	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
@@ -48,25 +49,33 @@ func Login(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	token := username + password
-
-	if user, exist := usersLoginInfo[token]; exist {
-		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0},
-			UserId:   user.Id,
-			Token:    token,
-		})
-	} else {
-		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+	code, loginUser := service.Login(username, password)
+	if code == -1 {
+		c.JSON(http.StatusInternalServerError, UserLoginResponse{
+			Response: Response{StatusCode: -1, StatusMsg: "Fail to login"},
 		})
 	}
+
+	if code == 1 {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: 1, StatusMsg: "Username or password is wrong"},
+		})
+	}
+
+	if code == 0 {
+		c.JSON(http.StatusOK, UserLoginResponse{
+			Response: Response{StatusCode: 0},
+			UserId:   loginUser.User.ID,
+			Token:    loginUser.Token,
+		})
+	}
+
 }
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	var user User
-	err := redis.Get(token, &user)
+	err := redis.Get(config.LoginTokenKey+token, &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, UserResponse{
 			Response: Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
