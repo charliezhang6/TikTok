@@ -1,7 +1,6 @@
 package service
 
 import (
-	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/util"
 	"golang.org/x/crypto/bcrypt"
@@ -13,7 +12,7 @@ type LoginUser struct {
 	Token string
 }
 
-func RegisterUser(name string, password string) (int64, string, error) {
+func Register(name string, password string) (int64, string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println(err)
@@ -26,7 +25,11 @@ func RegisterUser(name string, password string) (int64, string, error) {
 		return 0, "", err
 	}
 	token := CreateToken()
-	redis.Set(token, user, 0)
+	err = RefreshToken(token, &user)
+	if err != nil {
+		log.Fatal(err)
+		return 0, "", err
+	}
 	return userId, token, nil
 }
 
