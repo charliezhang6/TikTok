@@ -5,7 +5,6 @@ import (
 	"TikTok/util"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"strings"
 )
 
 type LoginUser struct {
@@ -56,7 +55,8 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 		log.Println(err)
 		return -1, nil
 	}
-	if strings.Compare(string(hashedPassword), string(hashedPassword)) != 0 {
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), hashedPassword)
+	if err != nil {
 		log.Println(err)
 		return 1, nil
 	}
