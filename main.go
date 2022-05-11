@@ -1,6 +1,7 @@
 package main
 
 import (
+	"TikTok/config"
 	"TikTok/redis"
 	"TikTok/repository"
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 )
 
 func main() {
+	config.InitConfig()
 	r := gin.Default()
 
 	initRouter(r)
@@ -20,5 +22,4 @@ func main() {
 		log.Fatal("Redis连接失败")
 	}
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-
 }

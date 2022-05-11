@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"gorm.io/gorm"
 	"log"
 	"sync"
 )
@@ -36,10 +37,12 @@ func (*UserDao) AddUser(user User) error {
 
 func (*UserDao) SelectByName(name string) (*User, error) {
 	var user User
-	err := db.Where("user_name=", name).First(&user).Error
-	if err != nil {
-		log.Fatal("查询用户失败" + err.Error())
-		return nil, err
+	err := db.Where("user_name = ?", name).First(&user).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
 	}
-	return &user, nil
+	if err != nil {
+		log.Fatal("查找用户出错" + err.Error())
+	}
+	return &user, err
 }
