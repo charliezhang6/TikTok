@@ -26,7 +26,7 @@ func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	if exist, _ := repository.NewUserDaoInstance().SelectByName(username); exist != nil {
+	if exist, _ := repository.NewUserDaoInstance().SelectByName(username); exist.ID != 0 {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})

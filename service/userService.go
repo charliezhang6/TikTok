@@ -50,12 +50,11 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 		log.Println(err)
 		return 1, nil
 	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Println(err)
 		return -1, nil
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), hashedPassword)
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		log.Println(err)
 		return 1, nil

@@ -36,9 +36,6 @@ func (*UserDao) AddUser(user User) error {
 
 func (*UserDao) SelectByName(name string) (*User, error) {
 	var user User
-	err := db.Where("user_name", name).First(&user).Error
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
+	err := db.Where("user_name = ?", name).First(&user).Error
+	return &user, err
 }
