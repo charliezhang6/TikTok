@@ -46,3 +46,13 @@ func (*UserDao) SelectByName(name string) (*User, error) {
 	}
 	return &user, err
 }
+
+//func (*UserDao) CountByName(name string) (int64, error) {
+//	var count int64
+//	err := db.Where("user_name = ?", name).Count(&count).Error
+//	if err != nil {
+//		log.Fatal("统计用户出错" + err.Error())
+//	}
+//	return count, err
+//
+//}

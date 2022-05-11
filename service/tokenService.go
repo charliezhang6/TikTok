@@ -5,7 +5,6 @@ import (
 	"TikTok/redis"
 	"TikTok/repository"
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/base32"
 	"log"
 )
@@ -16,9 +15,7 @@ func CreateToken() string {
 	if err != nil {
 		log.Fatal("生成token出错" + err.Error())
 	}
-	text := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
-	hash := sha256.Sum256([]byte(text))
-	token := string(hash[:])
+	token := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
 	return token
 }
 
