@@ -7,6 +7,14 @@ type Redis struct {
 	RedisDB       int    `yaml:"DB"`
 }
 
+type MySQL struct {
+	Host     string `yaml:"Host"`
+	User     string `yaml:"User"`
+	Port     string `yaml:"Port"`
+	Password string `yaml:"Password"`
+	DBName   string `yaml:"DBName"`
+}
+
 type Token struct {
 	ExpireTime int64 `yaml:"ExpireTime"`
 }
@@ -14,6 +22,7 @@ type Token struct {
 type configStruct struct {
 	Token `yaml:"Token"`
 	Redis `yaml:"Redis"`
+	MySQL `yaml:"MySQL"`
 }
 
 var Config = configStruct{}
