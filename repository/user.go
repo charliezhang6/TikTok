@@ -29,7 +29,7 @@ func NewUserDaoInstance() *UserDao {
 func (*UserDao) AddUser(user User) error {
 	err := db.Create(&user).Error
 	if err != nil {
-		log.Fatal("用户添加失败")
+		log.Println("用户添加失败" + err.Error())
 		return err
 	}
 	return nil
@@ -42,7 +42,7 @@ func (*UserDao) SelectByName(name string) (*User, error) {
 		return nil, nil
 	}
 	if err != nil {
-		log.Fatal("查找用户出错" + err.Error())
+		log.Println("查找用户出错" + err.Error())
 	}
 	return &user, err
 }

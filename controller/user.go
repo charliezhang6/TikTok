@@ -7,6 +7,7 @@ import (
 	"TikTok/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 // usersLoginInfo use map to store user info, and key is username+password for demo
@@ -75,12 +76,18 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	var user User
-	err := redis.Get(config.LoginTokenKey+token, &user)
+	err := redis.Get(config.UserKey+token, &user)
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, UserResponse{
 			Response: Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
 		})
 		return
+	}
+	if user.Id != userId {
+		c.JSON(http.StatusOK, UserResponse{
+			Response: Response{StatusCode: -1, StatusMsg: "用户信息有误"},
+		})
 	}
 	if user.Id != 0 {
 		c.JSON(http.StatusOK, UserResponse{

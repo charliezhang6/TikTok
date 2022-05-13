@@ -1,6 +1,8 @@
 package service
 
 import (
+	"TikTok/config"
+	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/util"
 	"golang.org/x/crypto/bcrypt"
@@ -21,13 +23,13 @@ func Register(name string, password string) (int64, string, error) {
 	user := repository.User{ID: userId, Name: name, Password: string(hashedPassword)}
 	err = repository.NewUserDaoInstance().AddUser(user)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("添加用户出错" + err.Error())
 		return 0, "", err
 	}
 	token := CreateToken()
 	err = RefreshToken(token, &user)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("添加token出错" + err.Error())
 		return 0, "", err
 	}
 	return userId, token, nil
@@ -65,4 +67,17 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 		return 1, nil
 	}
 	return 0, user
+}
+
+func checkUser(userId int64, token string) (bool, error) {
+	var user repository.User
+	err := redis.Get(config.UserKey+token, &user)
+	if err != nil {
+		log.Println("查询redis出错" + err.Error())
+		return false, err
+	}
+	if userId == user.ID {
+		return true, nil
+	}
+	return false, nil
 }

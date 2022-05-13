@@ -27,4 +27,4 @@ type configStruct struct {
 
 var Config = configStruct{}
 
-var LoginTokenKey = "login_token:"
+var UserKey = "user:"
