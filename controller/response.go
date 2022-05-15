@@ -1,12 +1,14 @@
 package controller
 
+import "TikTok/vo"
+
 type UserLoginResponse struct {
-	Response
+	vo.Response
 	UserId int64  `json:"user_id,omitempty"`
 	Token  string `json:"token"`
 }
 
 type UserResponse struct {
-	Response
-	User User `json:"user"`
+	vo.Response
+	User vo.User `json:"user"`
 }

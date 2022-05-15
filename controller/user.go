@@ -3,6 +3,7 @@ package controller
 import (
 	"TikTok/repository"
 	"TikTok/service"
+	"TikTok/vo"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 // usersLoginInfo use map to store user info, and key is username+password for demo
 // user data will be cleared every time the server starts
 // test data: username=zhanglei, password=douyin
-var usersLoginInfo = map[string]User{
+var usersLoginInfo = map[string]vo.User{
 	"zhangleidouyin": {
 		Id:            1,
 		Name:          "zhanglei",
@@ -27,17 +28,17 @@ func Register(c *gin.Context) {
 
 	if exist, _ := repository.NewUserDaoInstance().SelectByName(username); exist != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
+			Response: vo.Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
 		userId, token, err := service.Register(username, password)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, UserLoginResponse{
-				Response: Response{StatusCode: -1, StatusMsg: "用户注册失败"},
+				Response: vo.Response{StatusCode: -1, StatusMsg: "用户注册失败"},
 			})
 		}
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0},
+			Response: vo.Response{StatusCode: 0},
 			UserId:   userId,
 			Token:    token,
 		})
@@ -51,19 +52,19 @@ func Login(c *gin.Context) {
 	code, loginUser := service.Login(username, password)
 	if code == -1 {
 		c.JSON(http.StatusInternalServerError, UserLoginResponse{
-			Response: Response{StatusCode: -1, StatusMsg: "Fail to login"},
+			Response: vo.Response{StatusCode: -1, StatusMsg: "Fail to login"},
 		})
 	}
 
 	if code == 1 {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "Username or password is wrong"},
+			Response: vo.Response{StatusCode: 1, StatusMsg: "Username or password is wrong"},
 		})
 	}
 
 	if code == 0 {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0},
+			Response: vo.Response{StatusCode: 0},
 			UserId:   loginUser.User.ID,
 			Token:    loginUser.Token,
 		})
@@ -77,19 +78,19 @@ func UserInfo(c *gin.Context) {
 	user, err := service.CheckUser(userId, token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, UserResponse{
-			Response: Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
+			Response: vo.Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
 		})
 		return
 	}
 	if user == nil {
 		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "用户信息有误"},
+			Response: vo.Response{StatusCode: 1, StatusMsg: "用户信息有误"},
 		})
 		return
 	}
 	if user != nil {
 		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 0},
+			Response: vo.Response{StatusCode: 0},
 			User:     *user,
 		})
 		return
