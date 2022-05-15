@@ -31,11 +31,29 @@ func RelationAction(c *gin.Context) {
 		return
 	}
 	actionType := c.Query("action_type")
-	//targetId := c.Query("to_user_id")
+	targetId, _ := strconv.ParseInt(c.Query("to_user_id"), 10, 64)
 	if actionType == "1" {
-		//
+		_, err := service.Follow(userId, targetId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, UserListResponse{
+				Response: vo.Response{StatusCode: -1, StatusMsg: "关注失败"},
+			})
+			return
+		}
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: vo.Response{StatusCode: 0, StatusMsg: "关注成功"},
+		})
 	} else if actionType == "2" {
-		//
+		_, err := service.UnFollow(userId, targetId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, UserListResponse{
+				Response: vo.Response{StatusCode: -1, StatusMsg: "取关失败"},
+			})
+			return
+		}
+		c.JSON(http.StatusOK, UserListResponse{
+			Response: vo.Response{StatusCode: 0, StatusMsg: "取关成功"},
+		})
 	}
 }
 

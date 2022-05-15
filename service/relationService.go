@@ -17,9 +17,25 @@ func Follow(fromId int64, toId int64) (int64, error) {
 		log.Println("添加关注表失败" + err.Error())
 		return 0, err
 	}
+	follow := redis2.Z{Score: float64(timeStamp), Member: fromId}
+	result, err = redis.Client.ZAdd(config.FansKey+strconv.FormatInt(toId, 10), follow).Result()
+	if err != nil {
+		log.Println("添加粉丝表失败" + err.Error())
+		return 0, err
+	}
 	return result, nil
 }
 
-//func UnFollow(fromId int64, toId int64) {
-//
-//}
+func UnFollow(fromId int64, toId int64) (int64, error) {
+	result, err := redis.Client.ZRemRangeByRank(config.FollowKey+strconv.FormatInt(fromId, 10), toId, toId).Result()
+	if err != nil {
+		log.Println("删除关注表失败" + err.Error())
+		return 0, err
+	}
+	result, err = redis.Client.ZRemRangeByRank(config.FansKey+strconv.FormatInt(toId, 10), fromId, fromId).Result()
+	if err != nil {
+		log.Println("删除粉丝表失败" + err.Error())
+		return 0, err
+	}
+	return result, nil
+}
