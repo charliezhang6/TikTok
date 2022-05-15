@@ -19,15 +19,11 @@ func RelationAction(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	user, err := service.CheckUser(userId, token)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, UserListResponse{
-			Response: vo.Response{StatusCode: -1, StatusMsg: "查询用户出错"},
-		})
+		c.JSON(http.StatusInternalServerError, vo.Response{StatusCode: -1, StatusMsg: "查询用户出错"})
 		return
 	}
 	if user == nil {
-		c.JSON(http.StatusOK, UserListResponse{
-			Response: vo.Response{StatusCode: 1, StatusMsg: "用户信息有误"},
-		})
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "用户信息有误"})
 		return
 	}
 	actionType := c.Query("action_type")
@@ -35,25 +31,17 @@ func RelationAction(c *gin.Context) {
 	if actionType == "1" {
 		_, err := service.Follow(userId, targetId)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, UserListResponse{
-				Response: vo.Response{StatusCode: -1, StatusMsg: "关注失败"},
-			})
+			c.JSON(http.StatusInternalServerError, vo.Response{StatusCode: -1, StatusMsg: "关注失败"})
 			return
 		}
-		c.JSON(http.StatusOK, UserListResponse{
-			Response: vo.Response{StatusCode: 0, StatusMsg: "关注成功"},
-		})
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 0, StatusMsg: "关注成功"})
 	} else if actionType == "2" {
 		_, err := service.UnFollow(userId, targetId)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, UserListResponse{
-				Response: vo.Response{StatusCode: -1, StatusMsg: "取关失败"},
-			})
+			c.JSON(http.StatusInternalServerError, vo.Response{StatusCode: -1, StatusMsg: "取关失败"})
 			return
 		}
-		c.JSON(http.StatusOK, UserListResponse{
-			Response: vo.Response{StatusCode: 0, StatusMsg: "取关成功"},
-		})
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 0, StatusMsg: "取关成功"})
 	}
 }
 
