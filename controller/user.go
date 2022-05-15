@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"TikTok/config"
-	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
 	"github.com/gin-gonic/gin"
@@ -75,28 +73,25 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-	var user User
-	err := redis.Get(config.UserKey+token, &user)
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	user, err := service.CheckUser(userId, token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, UserResponse{
 			Response: Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
 		})
 		return
 	}
-	if user.Id != userId {
+	if user == nil {
 		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: -1, StatusMsg: "用户信息有误"},
+			Response: Response{StatusCode: 1, StatusMsg: "用户信息有误"},
 		})
+		return
 	}
-	if user.Id != 0 {
+	if user != nil {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
-			User:     user,
+			User:     *user,
 		})
-	} else {
-		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
-		})
+		return
 	}
 }

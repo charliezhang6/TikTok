@@ -28,3 +28,5 @@ type configStruct struct {
 var Config = configStruct{}
 
 var UserKey = "user:"
+var FollowKey = "follow:"
+var FansKey = "fans:"

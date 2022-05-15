@@ -2,6 +2,7 @@ package service
 
 import (
 	"TikTok/config"
+	"TikTok/controller"
 	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/util"
@@ -69,15 +70,15 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 	return 0, user
 }
 
-func checkUser(userId int64, token string) (bool, error) {
-	var user repository.User
+func CheckUser(userId int64, token string) (*controller.User, error) {
+	var user controller.User
 	err := redis.Get(config.UserKey+token, &user)
 	if err != nil {
 		log.Println("查询redis出错" + err.Error())
-		return false, err
+		return nil, err
 	}
-	if userId == user.ID {
-		return true, nil
+	if userId == user.Id {
+		return &user, nil
 	}
-	return false, nil
+	return nil, nil
 }
