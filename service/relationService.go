@@ -27,12 +27,12 @@ func Follow(fromId int64, toId int64) (int64, error) {
 }
 
 func UnFollow(fromId int64, toId int64) (int64, error) {
-	result, err := redis.Client.ZRemRangeByRank(config.FollowKey+strconv.FormatInt(fromId, 10), toId, toId).Result()
+	result, err := redis.Client.ZRem(config.FollowKey+strconv.FormatInt(fromId, 10), toId).Result()
 	if err != nil {
 		log.Println("删除关注表失败" + err.Error())
 		return 0, err
 	}
-	result, err = redis.Client.ZRemRangeByRank(config.FansKey+strconv.FormatInt(toId, 10), fromId, fromId).Result()
+	result, err = redis.Client.ZRem(config.FansKey+strconv.FormatInt(toId, 10), fromId).Result()
 	if err != nil {
 		log.Println("删除粉丝表失败" + err.Error())
 		return 0, err
