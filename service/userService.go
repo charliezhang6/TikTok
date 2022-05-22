@@ -5,7 +5,6 @@ import (
 	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/util"
-	"TikTok/vo"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
@@ -70,14 +69,14 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 	return 0, user
 }
 
-func CheckUser(userId int64, token string) (*vo.User, error) {
-	var user vo.User
+func CheckUser(userId int64, token string) (*repository.User, error) {
+	var user repository.User
 	err := redis.Get(config.UserKey+token, &user)
 	if err != nil {
 		log.Println("查询redis出错" + err.Error())
 		return nil, err
 	}
-	if userId == user.Id {
+	if userId == user.ID {
 		return &user, nil
 	}
 	return nil, nil

@@ -89,9 +89,10 @@ func UserInfo(c *gin.Context) {
 		return
 	}
 	if user != nil {
+
 		c.JSON(http.StatusOK, UserResponse{
 			Response: vo.Response{StatusCode: 0},
-			User:     *user,
+			User:     vo.User{Id: user.ID, Name: user.Name, FollowCount: user.FollowCount, FollowerCount: user.FansCount, IsFollow: false},
 		})
 		return
 	}

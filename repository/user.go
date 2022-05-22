@@ -7,9 +7,11 @@ import (
 )
 
 type User struct {
-	ID       int64  `gorm:"column:user_id"`
-	Name     string `gorm:"column:user_name"`
-	Password string `gorm:"column:user_password"`
+	ID          int64  `gorm:"column:user_id"`
+	Name        string `gorm:"column:user_name"`
+	Password    string `gorm:"column:user_password"`
+	FollowCount int64  `gorm:"column:follow_count"`
+	FansCount   int64  `gorm:"column:fans_count"`
 }
 
 type UserDao struct {
