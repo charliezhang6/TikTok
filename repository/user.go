@@ -49,12 +49,25 @@ func (*UserDao) SelectByName(name string) (*User, error) {
 	return &user, err
 }
 
-//func (*UserDao) CountByName(name string) (int64, error) {
-//	var count int64
-//	err := db.Where("user_name = ?", name).Count(&count).Error
-//	if err != nil {
-//		log.Fatal("统计用户出错" + err.Error())
-//	}
-//	return count, err
-//
-//}
+func (*UserDao) AddFollowCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("follow_count", user.FollowCount+1)
+}
+
+func (*UserDao) AddFansCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("fans_count", user.FansCount+1)
+}
+
+func (*UserDao) DecrFollowCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("follow_count", user.FollowCount-1)
+}
+func (*UserDao) DecrFansCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("fans_count", user.FansCount-1)
+}
