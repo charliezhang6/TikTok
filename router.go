@@ -2,6 +2,7 @@ package main
 
 import (
 	"TikTok/controller"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +18,7 @@ func initRouter(r *gin.Engine) {
 	apiRouter.POST("/user/register/", controller.Register)
 	apiRouter.POST("/user/login/", controller.Login)
 	apiRouter.POST("/publish/action/", controller.Publish)
-	apiRouter.GET("/publish/list/", controller.PublishList)
+	apiRouter.GET("/publish/list/", controller.PublishList) //测试命令get http://0.0.0.0:8080/douyin/publish/list
 
 	// extra apis - I
 	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
