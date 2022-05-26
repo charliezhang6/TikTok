@@ -51,7 +51,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	storePath := "D:/gotmp/"
+	storePath := "D:/VideoAndImage/"
 	filename := filepath.Base(data.Filename)
 	user := usersLoginInfo[token]
 	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
