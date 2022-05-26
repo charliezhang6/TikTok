@@ -10,3 +10,7 @@
 简易抖音服务端
 
 test
+
+2022.5.26 15:32 kyq
+视频投稿在win10环境测试正常,视频和封面存储路径在controller -> publish -> Publish -> storePath 修改x
+ffmpeg在linux环境还没测,下载太慢电脑快没电了orz,待会测了再来改
