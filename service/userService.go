@@ -71,9 +71,15 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 
 func CheckUser(userId int64, token string) (*repository.User, error) {
 	var user repository.User
-	err := redis.Get(config.UserKey+token, &user)
+	var err error
+	err = redis.Get(config.UserKey+token, &user)
 	if err != nil {
 		log.Println("查询redis出错" + err.Error())
+		return nil, err
+	}
+	err = RefreshToken(token, &user)
+	if err != nil {
+		log.Println("刷新token失败" + err.Error())
 		return nil, err
 	}
 	if userId == user.ID {
