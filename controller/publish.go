@@ -1,11 +1,14 @@
 package controller
 
 import (
+	"TikTok/service"
 	"TikTok/vo"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"path/filepath"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type VideoListResponse struct {
@@ -51,10 +54,41 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	c.JSON(http.StatusOK, VideoListResponse{
-		Response: vo.Response{
-			StatusCode: 0,
-		},
-		VideoList: DemoVideos,
-	})
+	//查询token和鉴权id
+	token := c.Query("token")
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+
+	//判断用户与token是否相同并从用户表中获取用户信息句柄
+	user, err := service.CheckUser(userId, token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, VideoListResponse{
+			Response: vo.Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
+		})
+		return
+	}
+	if user == nil {
+		c.JSON(http.StatusOK, VideoListResponse{
+			Response: vo.Response{StatusCode: 1, StatusMsg: "用户信息有误"},
+		})
+		return
+	}
+	if user != nil {
+		//根据用户信息从视频表中获取视频信息
+		videos, code := service.Getvideos(userId)
+		//返回结果json
+		if code != 0 { //尚未发布视频
+			c.JSON(http.StatusOK, VideoListResponse{
+				Response:  vo.Response{StatusCode: 0},
+				VideoList: nil,
+			})
+		}
+		if code == 0 {
+			c.JSON(http.StatusOK, VideoListResponse{
+				Response:  vo.Response{StatusCode: 0},
+				VideoList: videos,
+				// VideoList: DemoVideos, //逗号不可省略
+			})
+		}
+		return
+	}
 }
