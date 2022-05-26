@@ -1,12 +1,17 @@
 package controller
 
 import (
+	"TikTok/repository"
 	"TikTok/service"
+	"TikTok/util"
 	"TikTok/vo"
 	"fmt"
 	"net/http"
+	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,9 +21,20 @@ type VideoListResponse struct {
 	VideoList []vo.Video `json:"video_list"`
 }
 
+// GetCover get cover image from video file
+func GetCover(filename string, filepath string) (string, string) {
+	filerealname := strings.Split(filename, ".")
+	filepathname := filepath + "/video/" + filename
+	coverpathname := filepath + "/image/" + filerealname[0] + ".jpeg"
+	cmd := exec.Command("ffmpeg", "-i", filepathname, "-ss", "1", "-f", "image2", coverpathname)
+
+	cmd.Run()
+	return coverpathname, filepathname
+}
+
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
-	token := c.Query("token")
+	token := c.PostForm("token")
 
 	if _, exist := usersLoginInfo[token]; !exist {
 		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
@@ -26,6 +42,7 @@ func Publish(c *gin.Context) {
 	}
 
 	data, err := c.FormFile("data")
+	title := c.PostForm("title")
 	if err != nil {
 		c.JSON(http.StatusOK, vo.Response{
 			StatusCode: 1,
@@ -34,10 +51,11 @@ func Publish(c *gin.Context) {
 		return
 	}
 
+	storePath := "D:/gotmp/"
 	filename := filepath.Base(data.Filename)
 	user := usersLoginInfo[token]
 	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
-	saveFile := filepath.Join("./public/", finalName)
+	saveFile := filepath.Join(storePath, finalName)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, vo.Response{
 			StatusCode: 1,
@@ -50,6 +68,19 @@ func Publish(c *gin.Context) {
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
 	})
+	coverpath, videopath := GetCover(finalName, storePath)
+	userId := usersLoginInfo[token].Id
+	currentTime := time.Now()
+	id := util.GenSonyflake()
+	video := repository.Video{
+		VideoId:   id,
+		UserId:    userId,
+		DateTime:  currentTime,
+		VideoPath: videopath,
+		CoverPath: coverpath,
+		Title:     title,
+	}
+	service.Addvideos(video)
 }
 
 // PublishList all users have same publish video list
