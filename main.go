@@ -21,5 +21,5 @@ func main() {
 	if err != nil {
 		log.Fatal("Redis连接失败")
 	}
-	r.Run("127.0.0.1:9898")
+	r.Run("0.0.0.0:9898")
 }
