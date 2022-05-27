@@ -87,7 +87,7 @@ func PublishList(c *gin.Context) {
 			c.JSON(http.StatusOK, VideoListResponse{
 				Response:  vo.Response{StatusCode: 0},
 				VideoList: videos,
-				// VideoList: DemoVideos, //逗号不可省略
+				// VideoList: DemoTestVideos, //逗号不可省略
 			})
 		}
 		return
