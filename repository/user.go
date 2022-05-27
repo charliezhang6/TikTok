@@ -49,6 +49,18 @@ func (*UserDao) SelectByName(name string) (*User, error) {
 	return &user, err
 }
 
+func (*UserDao) SelectById(id int64) (*User, error) {
+	var user User
+	err := db.Where("user_id = ?", id).First(&user).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		log.Println("查找用户出错" + err.Error())
+	}
+	return &user, err
+}
+
 func (*UserDao) AddFollowCountById(id int64) {
 	var user User
 	db.First(&user, "user_id=?", id)
