@@ -20,12 +20,14 @@ import (
 // }
 
 type Video struct {
-	VideoId   int64     `gorm:"column:video_id"`
-	UserId    int64     `gorm:"column:user_id"`
-	DateTime  time.Time `gorm:"column:date_time"`
-	VideoPath string    `gorm:"column:video_path"`
-	CoverPath string    `gorm:"column:cover_path"`
-	Title     string    `gorm:"column:title"`
+	VideoId       int64     `gorm:"column:video_id"`
+	UserId        int64     `gorm:"column:user_id"`
+	DateTime      time.Time `gorm:"column:date_time"`
+	VideoPath     string    `gorm:"column:video_path"`
+	CoverPath     string    `gorm:"column:cover_path"`
+	Title         string    `gorm:"column:title"`
+	FavoriteCount int64     `gorm:"column:favorite_count"`
+	CommentCount  int64     `gorm:"column:comment_count"`
 }
 
 type VideoDao struct {

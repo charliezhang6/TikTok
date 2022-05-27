@@ -34,6 +34,7 @@ func GetCover(filename string, filepath string) (string, string) {
 
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
+	// 获取token, 不能用query
 	token := c.PostForm("token")
 
 	if _, exist := usersLoginInfo[token]; !exist {
@@ -51,6 +52,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
+	// 视频存储路径
 	storePath := "/root/VideoImage"
 	filename := filepath.Base(data.Filename)
 	user := usersLoginInfo[token]
@@ -68,17 +70,23 @@ func Publish(c *gin.Context) {
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
 	})
+
+	// 获取图片保存并返回视频和图片路径
 	coverpath, videopath := GetCover(finalName, storePath)
 	userId := usersLoginInfo[token].Id
 	currentTime := time.Now()
 	id := util.GenSonyflake()
+
+	// 存数据库
 	video := repository.Video{
-		VideoId:   id,
-		UserId:    userId,
-		DateTime:  currentTime,
-		VideoPath: videopath,
-		CoverPath: coverpath,
-		Title:     title,
+		VideoId:       id,
+		UserId:        userId,
+		DateTime:      currentTime,
+		VideoPath:     videopath,
+		CoverPath:     coverpath,
+		Title:         title,
+		FavoriteCount: 0,
+		CommentCount:  0,
 	}
 	service.Addvideos(video)
 }
