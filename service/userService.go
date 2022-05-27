@@ -104,7 +104,7 @@ func SearchUser(userId int64, token string) (*vo.User, error) {
 		return nil, err
 	}
 	user, err := repository.NewUserDaoInstance().SelectById(userId)
-	var voUser vo.User = vo.User{Id: userId, Name: user.Name, FollowCount: user.FollowCount, FollowerCount: user.FansCount}
+	var voUser = vo.User{Id: userId, Name: user.Name, FollowCount: user.FollowCount, FollowerCount: user.FansCount}
 	voUser.IsFollow, err = IsFollow(loginUser.ID, userId)
 	if err != nil {
 		log.Println("判断是否关注出错" + err.Error())
