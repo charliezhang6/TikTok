@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func GenSonyflake() int64 {
+func GenSnowflake() int64 {
 
 	flake := sonyflake.NewSonyflake(sonyflake.Settings{})
 	id, err := flake.NextID()

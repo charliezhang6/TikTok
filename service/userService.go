@@ -19,7 +19,7 @@ func Register(name string, password string) (int64, string, error) {
 	if err != nil {
 		log.Println(err)
 	}
-	userId := util.GenSonyflake()
+	userId := util.GenSnowflake()
 	user := repository.User{ID: userId, Name: name, Password: string(hashedPassword)}
 	err = repository.NewUserDaoInstance().AddUser(user)
 	if err != nil {
