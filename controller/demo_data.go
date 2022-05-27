@@ -17,7 +17,7 @@ var DemoVideos = []vo.Video{
 	},
 }
 
-var DemoVideoTests = []repository.Video{
+var DemoTestVideos = []repository.Video{
 	{
 		Author:        DemoUser,
 		CommentCount:  0,

@@ -58,6 +58,14 @@ func PublishList(c *gin.Context) {
 	//查询token和鉴权id
 	token := c.Query("token")
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	//以下为测试
+	// videos, _ := service.GetVideos(1)
+	// c.JSON(http.StatusOK, VideoListResponse{
+	// 	Response:  vo.Response{StatusCode: 0},
+	// 	VideoList: videos,
+	// 	// VideoList: DemoTestVideos, //逗号不可省略
+	// })
+	// return
 
 	//判断用户与token是否相同并从用户表中获取用户信息句柄
 	user, err := service.CheckUser(userId, token)
