@@ -75,7 +75,7 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	user, err := service.CheckUser(userId, token)
+	user, err := service.SearchUser(userId, token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, UserResponse{
 			Response: vo.Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
@@ -91,7 +91,7 @@ func UserInfo(c *gin.Context) {
 	if user != nil {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: vo.Response{StatusCode: 0},
-			User:     vo.User{Id: user.ID, Name: user.Name, FollowCount: user.FollowCount, FollowerCount: user.FansCount, IsFollow: false},
+			User:     *user,
 		})
 		return
 	}

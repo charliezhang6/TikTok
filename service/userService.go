@@ -5,6 +5,7 @@ import (
 	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/util"
+	"TikTok/vo"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
@@ -69,6 +70,7 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 	return 0, user
 }
 
+// CheckUser 检查用户id和token是否正确
 func CheckUser(userId int64, token string) (*repository.User, error) {
 	var user repository.User
 	var err error
@@ -86,4 +88,27 @@ func CheckUser(userId int64, token string) (*repository.User, error) {
 		return &user, nil
 	}
 	return nil, nil
+}
+
+//通过token查询对应的用户
+func SearchUser(userId int64, token string) (*vo.User, error) {
+	var loginUser repository.User
+	err := redis.Get(config.UserKey+token, &loginUser)
+	if err != nil {
+		log.Println("查询redis出错" + err.Error())
+		return nil, err
+	}
+	err = RefreshToken(token, &loginUser)
+	if err != nil {
+		log.Println("刷新token失败" + err.Error())
+		return nil, err
+	}
+	user, err := repository.NewUserDaoInstance().SelectById(userId)
+	var voUser vo.User = vo.User{Id: userId, Name: user.Name, FollowCount: user.FollowCount, FollowerCount: user.FansCount}
+	voUser.IsFollow, err = IsFollow(loginUser.ID, userId)
+	if err != nil {
+		log.Println("判断是否关注出错" + err.Error())
+		return nil, err
+	}
+	return &voUser, nil
 }
