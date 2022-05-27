@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"TikTok/repository"
 	"TikTok/service"
 	"TikTok/vo"
 	"fmt"
@@ -13,7 +14,7 @@ import (
 
 type VideoListResponse struct {
 	vo.Response
-	VideoList []vo.Video `json:"video_list"`
+	VideoList []repository.Video `json:"video_list"`
 }
 
 // Publish check token then save upload file to public directory
@@ -74,7 +75,7 @@ func PublishList(c *gin.Context) {
 	}
 	if user != nil {
 		//根据用户信息从视频表中获取视频信息
-		videos, code := service.Getvideos(userId)
+		videos, code := service.GetVideos(userId)
 		//返回结果json
 		if code != 0 { //尚未发布视频
 			c.JSON(http.StatusOK, VideoListResponse{
