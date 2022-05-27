@@ -90,7 +90,7 @@ func CheckUser(userId int64, token string) (*repository.User, error) {
 	return nil, nil
 }
 
-//通过token查询对应的用户
+// SearchUser 通过token查询对应的用户
 func SearchUser(userId int64, token string) (*vo.User, error) {
 	var loginUser repository.User
 	err := redis.Get(config.UserKey+token, &loginUser)
