@@ -43,6 +43,7 @@ func RelationAction(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, vo.Response{StatusCode: 0, StatusMsg: "取关成功"})
 	}
+	return
 }
 
 // FollowList all users have same follow list
