@@ -2,12 +2,11 @@ package service
 
 import (
 	"TikTok/repository"
-	"TikTok/vo"
 	"log"
 )
 
-func Getvideos(userId int64) ([]vo.Video, int) {
-	var videos []vo.Video
+func GetVideos(userId int64) ([]repository.Video, int) {
+	var videos []repository.Video
 	videos, err := repository.NewVideoDaoInstance().SelectById(userId)
 	if err != nil {
 		log.Println(err)
