@@ -55,7 +55,7 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	//查询token和鉴权id
+	//查询token和要访问的用户
 	token := c.Query("token")
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	//以下为测试
@@ -67,8 +67,8 @@ func PublishList(c *gin.Context) {
 	// })
 	// return
 
-	//判断用户与token是否相同并从用户表中获取用户信息句柄
-	user, err := service.CheckUser(userId, token)
+	//查询要访问的用户对象
+	user, err := service.SearchUser(userId, token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, VideoListResponse{
 			Response: vo.Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},

@@ -15,7 +15,7 @@ type Video struct {
 	CoverURL      string  `json:"cover_url" gorm:"column:cover_path"`             // 视频封面地址
 	FavoriteCount int64   `json:"favorite_count" gorm:"column:favorite_count"`    // 视频的点赞总数
 	CommentCount  int64   `json:"comment_count" gorm:"column:comment_count"`      // 视频的评论总数
-	//这里有个问题，同一个视频的点赞情况对于每个id都是不一样的，如何存储点赞呢
+	//结构体变量isfavorite是否点赞等到点赞列表完成后再写
 	IsFavorite bool   `json:"is_favorite" gorm:"column:is_favorite"` // true-已点赞，false-未点赞
 	Title      string `json:"title" gorm:"column:title"`             // 视频标题
 }
