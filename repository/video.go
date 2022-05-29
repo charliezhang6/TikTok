@@ -37,7 +37,7 @@ func NewVideoDaoInstance() *VideoDao {
 // 	return nil
 // }
 
-func (*VideoDao) SelectById(userId int64) ([]Video, error) {
+func (*VideoDao) SelectByUserId(userId int64) ([]Video, error) {
 	var videos []Video
 	err := db.Table("videos").Joins("inner join users on videos.user_id = users.user_id where videos.user_id = ?", userId).
 		Find(&videos).Error
@@ -48,6 +48,12 @@ func (*VideoDao) SelectById(userId int64) ([]Video, error) {
 		log.Println("查找视频出错" + err.Error())
 	}
 	return videos, err
+}
+
+func (*VideoDao) SelectById(videoId int64) (Video, error) {
+	var video Video
+	db.First(&video, "video_id = ?", videoId)
+	return video, nil
 }
 
 func (*VideoDao) AddFavoriteCount(videoId int64) {

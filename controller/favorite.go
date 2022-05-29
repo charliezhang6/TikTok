@@ -43,10 +43,33 @@ func FavoriteAction(c *gin.Context) {
 
 // FavoriteList all users have same favorite video list
 func FavoriteList(c *gin.Context) {
+	token := c.Query("token")
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	user, err := service.SearchUser(userId, token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, UserResponse{
+			Response: vo.Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
+		})
+		return
+	}
+	if user == nil {
+		c.JSON(http.StatusOK, UserResponse{
+			Response: vo.Response{StatusCode: 1, StatusMsg: "用户信息有误"},
+		})
+		return
+	}
+
+	videos, err := service.GetFavoriteList(userId, token)
+	if err != nil {
+		c.JSON(http.StatusOK, UserResponse{
+			Response: vo.Response{StatusCode: 2, StatusMsg: "获取点赞列表失败"},
+		})
+		return
+	}
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: vo.Response{
 			StatusCode: 0,
 		},
-		VideoList: DemoTestVideos,
+		VideoList: videos,
 	})
 }
