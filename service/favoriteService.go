@@ -23,7 +23,7 @@ func Favorite(userId int64, videoId int64) (int64, error) {
 }
 
 func UnFavorite(userId int64, videoId int64) (int64, error) {
-	result, err := redis.Client.ZRem(config.FollowKey+strconv.FormatInt(userId, 10), videoId).Result()
+	result, err := redis.Client.ZRem(config.FavoriteKey+strconv.FormatInt(userId, 10), videoId).Result()
 	if err != nil {
 		log.Println("取消点赞失败" + err.Error())
 		return 0, err
