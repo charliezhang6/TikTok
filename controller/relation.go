@@ -49,19 +49,19 @@ func RelationAction(c *gin.Context) {
 // FollowList all users have same follow list
 func FollowList(c *gin.Context) {
 	token := c.Query("token")
-	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	user, err := service.CheckUser(userId, token)
+	viewId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	loginUser, err := service.GetUserByToken(token)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, vo.Response{StatusCode: -1, StatusMsg: "查询用户出错"})
 		return
 	}
-	if user == nil {
+	if loginUser == nil {
 		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "用户信息有误"})
 		return
 	}
 
-	userList, err := service.GetFollowList(userId)
+	userList, err := service.GetFollowList(viewId, loginUser.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, vo.Response{StatusCode: -1, StatusMsg: "获取关注列表失败"})
 		return
@@ -77,18 +77,19 @@ func FollowList(c *gin.Context) {
 // FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
 	token := c.Query("token")
-	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
-	user, err := service.CheckUser(userId, token)
+	viewId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	loginUser, err := service.GetUserByToken(token)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, vo.Response{StatusCode: -1, StatusMsg: "查询用户出错"})
 		return
 	}
-	if user == nil {
+	if loginUser == nil {
 		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "用户信息有误"})
 		return
 	}
 
-	userList, err := service.GetFanList(userId)
+	userList, err := service.GetFanList(viewId, loginUser.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, vo.Response{StatusCode: -1, StatusMsg: "获取粉丝列表失败"})
 		return
