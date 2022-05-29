@@ -49,3 +49,15 @@ func (*VideoDao) SelectById(userId int64) ([]Video, error) {
 	}
 	return videos, err
 }
+
+func (*VideoDao) AddFavoriteCount(videoId int64) {
+	var video Video
+	db.First(&video, "video_id = ?", videoId)
+	db.Model(&video).Update("favorite_count", video.FavoriteCount+1)
+}
+
+func (*VideoDao) DecrFavoriteCount(videoId int64) {
+	var video Video
+	db.First(&video, "video_id = ?", videoId)
+	db.Model(&video).Update("favorite_count", video.FavoriteCount-1)
+}

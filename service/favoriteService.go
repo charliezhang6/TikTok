@@ -3,6 +3,7 @@ package service
 import (
 	"TikTok/config"
 	"TikTok/redis"
+	"TikTok/repository"
 	redis2 "github.com/go-redis/redis"
 	"log"
 	"strconv"
@@ -17,7 +18,7 @@ func Favorite(userId int64, videoId int64) (int64, error) {
 		log.Println("点赞添加失败" + err.Error())
 		return 0, err
 	}
-	//todo 视频表添加点赞数量
+	repository.NewVideoDaoInstance().AddFavoriteCount(videoId)
 	return result, nil
 }
 
@@ -27,6 +28,6 @@ func UnFavorite(userId int64, videoId int64) (int64, error) {
 		log.Println("取消点赞失败" + err.Error())
 		return 0, err
 	}
-	//todo 视频表减少点赞数量
+	repository.NewVideoDaoInstance().DecrFavoriteCount(videoId)
 	return result, nil
 }
