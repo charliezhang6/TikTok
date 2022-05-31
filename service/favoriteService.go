@@ -43,7 +43,7 @@ func IsFavorite(userId int64, videoId int64) (bool, error) {
 }
 
 func GetFavoriteList(userId int64, token string) ([]repository.Video, error) {
-	favorites, err := redis.Client.ZRange(config.FollowKey+strconv.FormatInt(userId, 10), 0, -1).Result()
+	favorites, err := redis.Client.ZRange(config.FavoriteKey+strconv.FormatInt(userId, 10), 0, -1).Result()
 	if err != nil {
 		log.Println("获取点赞列表失败" + err.Error())
 		return nil, err
