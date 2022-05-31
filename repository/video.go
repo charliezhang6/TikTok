@@ -67,3 +67,24 @@ func (*VideoDao) DecrFavoriteCount(videoId int64) {
 	db.First(&video, "video_id = ?", videoId)
 	db.Model(&video).Update("favorite_count", video.FavoriteCount-1)
 }
+
+func (*VideoDao) SelectVideoById(videoID int64) (*Video, error) {
+	var video Video
+	err := db.Table("videos").Where("video_id = ? ", videoID).Find(&video).Error
+	if err != nil {
+		log.Println("查找视频出错 " + err.Error())
+	}
+	return &video, nil
+}
+
+func (*VideoDao) IncrCommentCount(videoId int64) {
+	var video Video
+	db.First(&video, "video_id = ?", videoId)
+	db.Model(&video).Update("comment_count", video.CommentCount+1)
+}
+
+func (*VideoDao) DecrCommentCount(videoId int64) {
+	var video Video
+	db.First(&video, "video_id = ?", videoId)
+	db.Model(&video).Update("comment_count", video.CommentCount-1)
+}

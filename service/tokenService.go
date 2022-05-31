@@ -23,3 +23,19 @@ func RefreshToken(token string, user *repository.User) error {
 	err := redis.Set(config.UserKey+token, user, config.Config.ExpireTime*60)
 	return err
 }
+
+func GetUserByToken(token string) (*repository.User, error) {
+	var user repository.User
+	var err error
+	err = redis.Get(config.UserKey+token, &user)
+	if err != nil {
+		log.Println("查询redis出错" + err.Error())
+		return nil, err
+	}
+	err = RefreshToken(token, &user)
+	if err != nil {
+		log.Println("刷新token失败" + err.Error())
+		return nil, err
+	}
+	return &user, nil
+}

@@ -56,11 +56,10 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 	user, err := repository.NewUserDaoInstance().SelectByName(name)
 	if err != nil {
 		log.Println(err)
-		return 1, nil
-	}
-	if err != nil {
-		log.Println(err)
 		return -1, nil
+	}
+	if user == nil {
+		return 1, nil
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
