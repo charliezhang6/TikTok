@@ -59,7 +59,7 @@ func PublishList(c *gin.Context) {
 	token := c.Query("token")
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	//以下为测试
-	// videos, _ := service.GetVideos(1)
+	// videos, _ := service.GetVideos(1, token)
 	// c.JSON(http.StatusOK, VideoListResponse{
 	// 	Response:  vo.Response{StatusCode: 0},
 	// 	VideoList: videos,
@@ -83,7 +83,7 @@ func PublishList(c *gin.Context) {
 	}
 	if user != nil {
 		//根据用户信息从视频表中获取视频信息
-		videos, code := service.GetVideos(userId)
+		videos, code := service.GetVideos(userId, token)
 		//返回结果json
 		if code != 0 { //尚未发布视频
 			c.JSON(http.StatusOK, VideoListResponse{
