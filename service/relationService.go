@@ -46,14 +46,14 @@ func UnFollow(fromId int64, toId int64) (int64, error) {
 	return result, nil
 }
 
-func GetFollowList(id int64) ([]vo.User, error) {
-	followings, err := redis.Client.ZRange(config.FollowKey+strconv.FormatInt(id, 10), 0, -1).Result()
+func GetFollowList(viewId int64, loginId int64) ([]vo.User, error) {
+	followings, err := redis.Client.ZRange(config.FollowKey+strconv.FormatInt(viewId, 10), 0, -1).Result()
 	if err != nil {
 		log.Println("获取关注列表失败" + err.Error())
 		return nil, err
 	}
-	userList := make([]vo.User, len(followings))
-	for i, following := range followings {
+	userList := make([]vo.User, 0)
+	for _, following := range followings {
 		var toId int64
 		toId, err = strconv.ParseInt(following, 10, 64)
 		if err != nil {
@@ -64,19 +64,24 @@ func GetFollowList(id int64) ([]vo.User, error) {
 		if err != nil {
 			return nil, err
 		}
-		userList[i] = vo.User{
+		isFollow, err := IsFollow(loginId, toId)
+		if err != nil {
+			log.Println("判断关注失败")
+			return nil, err
+		}
+		userList = append(userList, vo.User{
 			Id:            toId,
 			Name:          user.Name,
 			FollowCount:   user.FollowCount,
 			FollowerCount: user.FansCount,
-			IsFollow:      true,
-		}
+			IsFollow:      isFollow,
+		})
 	}
 	return userList, err
 }
 
-func GetFanList(id int64) ([]vo.User, error) {
-	sid := strconv.FormatInt(id, 10)
+func GetFanList(viewId int64, loginId int64) ([]vo.User, error) {
+	sid := strconv.FormatInt(viewId, 10)
 	fans, err := redis.Client.ZRange(config.FansKey+sid, 0, -1).Result()
 	if err != nil {
 		log.Println("获取关注列表失败" + err.Error())
@@ -94,7 +99,7 @@ func GetFanList(id int64) ([]vo.User, error) {
 		if err != nil {
 			return nil, err
 		}
-		isFollow, err := IsFollow(id, user.ID)
+		isFollow, err := IsFollow(loginId, user.ID)
 		userList[i] = vo.User{
 			Id:            toId,
 			Name:          user.Name,

@@ -30,3 +30,4 @@ var Config = configStruct{}
 var UserKey = "user:"
 var FollowKey = "follow:"
 var FansKey = "fans:"
+var FavoriteKey = "favorite:"

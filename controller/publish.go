@@ -18,7 +18,7 @@ import (
 
 type VideoListResponse struct {
 	vo.Response
-	VideoList []vo.Video `json:"video_list"`
+	VideoList []repository.Video `json:"video_list"`
 }
 
 // GetCover get cover image from video file
@@ -75,15 +75,15 @@ func Publish(c *gin.Context) {
 	coverpath, videopath := GetCover(finalName, storePath)
 	userId := usersLoginInfo[token].Id
 	currentTime := time.Now()
-	id := util.GenSonyflake()
+	id := util.GenSnowflake()
 
 	// 存数据库
 	video := repository.Video{
-		VideoId:       id,
+		ID:            id,
 		UserId:        userId,
 		DateTime:      currentTime,
-		VideoPath:     videopath,
-		CoverPath:     coverpath,
+		PlayURL:       videopath,
+		CoverURL:      coverpath,
 		Title:         title,
 		FavoriteCount: 0,
 		CommentCount:  0,
@@ -93,12 +93,20 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	//查询token和鉴权id
+	//查询token和要访问的用户
 	token := c.Query("token")
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	//以下为测试
+	// videos, _ := service.GetVideos(1)
+	// c.JSON(http.StatusOK, VideoListResponse{
+	// 	Response:  vo.Response{StatusCode: 0},
+	// 	VideoList: videos,
+	// 	// VideoList: DemoTestVideos, //逗号不可省略
+	// })
+	// return
 
-	//判断用户与token是否相同并从用户表中获取用户信息句柄
-	user, err := service.CheckUser(userId, token)
+	//查询要访问的用户对象
+	user, err := service.SearchUser(userId, token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, VideoListResponse{
 			Response: vo.Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
@@ -113,7 +121,7 @@ func PublishList(c *gin.Context) {
 	}
 	if user != nil {
 		//根据用户信息从视频表中获取视频信息
-		videos, code := service.Getvideos(userId)
+		videos, code := service.GetVideos(userId)
 		//返回结果json
 		if code != 0 { //尚未发布视频
 			c.JSON(http.StatusOK, VideoListResponse{
@@ -125,7 +133,7 @@ func PublishList(c *gin.Context) {
 			c.JSON(http.StatusOK, VideoListResponse{
 				Response:  vo.Response{StatusCode: 0},
 				VideoList: videos,
-				// VideoList: DemoVideos, //逗号不可省略
+				// VideoList: DemoTestVideos, //逗号不可省略
 			})
 		}
 		return
