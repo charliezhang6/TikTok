@@ -2,10 +2,9 @@ package repository
 
 import (
 	"TikTok/vo"
+	"gorm.io/gorm"
 	"log"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Video struct {
