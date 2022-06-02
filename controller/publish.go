@@ -1,11 +1,14 @@
 package controller
 
 import (
+	"TikTok/config"
+	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
 	"TikTok/util"
 	"TikTok/vo"
 	"fmt"
+	"log"
 	"net/http"
 	"os/exec"
 	"path/filepath"
@@ -37,7 +40,10 @@ func Publish(c *gin.Context) {
 	// 获取token, 不能用query
 	token := c.PostForm("token")
 
-	if _, exist := usersLoginInfo[token]; !exist {
+	var videoUser repository.User
+	err := redis.Get(config.UserKey+token, &videoUser)
+	if err != nil {
+		log.Println("查询redis出错" + err.Error())
 		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
@@ -55,8 +61,7 @@ func Publish(c *gin.Context) {
 	// 视频存储路径
 	storePath := "/root/VideoImage"
 	filename := filepath.Base(data.Filename)
-	user := usersLoginInfo[token]
-	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
+	finalName := fmt.Sprintf("%d_%s", videoUser.ID, filename)
 	saveFile := filepath.Join(storePath, finalName)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, vo.Response{
@@ -73,7 +78,7 @@ func Publish(c *gin.Context) {
 
 	// 获取图片保存并返回视频和图片路径
 	coverpath, videopath := GetCover(finalName, storePath)
-	userId := usersLoginInfo[token].Id
+	userId := videoUser.ID
 	currentTime := time.Now()
 	id := util.GenSnowflake()
 

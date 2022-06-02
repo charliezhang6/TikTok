@@ -20,7 +20,7 @@ func GetVideos(userId int64) ([]repository.Video, int) {
 }
 
 func Addvideos(video repository.Video) {
-	err := repository.NewVideoDaoInstance().Addvideo(video)
+	err := repository.NewVideoDaoInstance().AddVideo(video)
 	if err != nil {
 		log.Println(err)
 	}
