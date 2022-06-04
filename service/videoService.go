@@ -18,3 +18,17 @@ func GetVideos(userId int64) ([]repository.Video, int) {
 	}
 	return videos, 0
 }
+
+// func returnLastvideo() ([]repository.Video,error){
+// 	var videos []repository.Video
+// 	err := repository.db.Limit(30).Order("date_time desc").Find(&videos).Error
+// 	if err == gorm.ErrRecordNotFound {
+// 		return nil, nil
+// 	}
+// 	if err != nil {
+// 		log.Println("查找视频出错" + err.Error())
+// 	}
+
+// 	return videos,err
+
+// }
