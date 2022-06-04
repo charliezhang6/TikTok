@@ -1,13 +1,20 @@
 package controller
 
 import (
+	"TikTok/config"
+	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
+	"TikTok/util"
 	"TikTok/vo"
 	"fmt"
+	"log"
 	"net/http"
+	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,16 +24,32 @@ type VideoListResponse struct {
 	VideoList []repository.Video `json:"video_list"`
 }
 
+// GetCover get cover image from video file
+func GetCover(filename string, filepath string) (string, string) {
+	filerealname := strings.Split(filename, ".")
+	filepathname := filepath + "/video/" + filename
+	coverpathname := filepath + "/image/" + filerealname[0] + ".jpeg"
+	cmd := exec.Command("ffmpeg", "-i", filepathname, "-ss", "1", "-f", "image2", "-frames:v", "1", coverpathname)
+
+	cmd.Run()
+	return coverpathname, filepathname
+}
+
 // Publish check token then save upload file to public directory
 func Publish(c *gin.Context) {
-	token := c.Query("token")
+	// 获取token, 不能用query
+	token := c.PostForm("token")
 
-	if _, exist := usersLoginInfo[token]; !exist {
+	var videoUser repository.User
+	err := redis.Get(config.UserKey+token, &videoUser)
+	if err != nil {
+		log.Println("查询redis出错" + err.Error())
 		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
 
 	data, err := c.FormFile("data")
+	title := c.PostForm("title")
 	if err != nil {
 		c.JSON(http.StatusOK, vo.Response{
 			StatusCode: 1,
@@ -35,10 +58,11 @@ func Publish(c *gin.Context) {
 		return
 	}
 
+	// 视频存储路径
+	storePath := "/root/VideoImage"
 	filename := filepath.Base(data.Filename)
-	user := usersLoginInfo[token]
-	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
-	saveFile := filepath.Join("./public/", finalName)
+	finalName := fmt.Sprintf("%d_%s", videoUser.ID, filename)
+	saveFile := filepath.Join(storePath, finalName)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, vo.Response{
 			StatusCode: 1,
@@ -51,6 +75,25 @@ func Publish(c *gin.Context) {
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
 	})
+
+	// 获取图片保存并返回视频和图片路径
+	coverpath, videopath := GetCover(finalName, storePath)
+	userId := videoUser.ID
+	currentTime := time.Now()
+	id := util.GenSnowflake()
+
+	// 存数据库
+	video := repository.Video{
+		ID:            id,
+		UserId:        userId,
+		DateTime:      currentTime,
+		PlayURL:       videopath,
+		CoverURL:      coverpath,
+		Title:         title,
+		FavoriteCount: 0,
+		CommentCount:  0,
+	}
+	service.AddVideos(video)
 }
 
 // PublishList all users have same publish video list

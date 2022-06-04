@@ -31,3 +31,4 @@ var UserKey = "user:"
 var FollowKey = "follow:"
 var FansKey = "fans:"
 var FavoriteKey = "favorite:"
+var FEEDNUM = 30

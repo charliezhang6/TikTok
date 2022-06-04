@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"TikTok/config"
 	"TikTok/vo"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -16,8 +18,9 @@ type Video struct {
 	FavoriteCount int64   `gorm:"column:favorite_count" json:"favorite_count"`    // 视频的点赞总数
 	CommentCount  int64   `gorm:"column:comment_count" json:"comment_count"`      // 视频的评论总数
 	//结构体变量isfavorite是否点赞等到点赞列表完成后再写
-	IsFavorite bool   `gorm:"column:is_favorite" json:"is_favorite"` // true-已点赞，false-未点赞
-	Title      string `gorm:"column:title" json:"title"`             // 视频标题
+	IsFavorite bool      `json:"is_favorite" gorm:"column:is_favorite"` // true-已点赞，false-未点赞
+	Title      string    `json:"title" gorm:"column:title"`             // 视频标题
+	DateTime   time.Time `json:"time" gorm:"column:date_time"`          // 视频上传时间
 }
 
 type VideoDao struct {
@@ -32,10 +35,14 @@ func NewVideoDaoInstance() *VideoDao {
 	return videoDao
 }
 
-// func (*VideoDao) Addvideo(user User) error {
-
-// 	return nil
-// }
+func (*VideoDao) AddVideo(video Video) error {
+	err := db.Create(&video).Error
+	if err != nil {
+		log.Println("视频添加失败" + err.Error())
+		return err
+	}
+	return nil
+}
 
 func (*VideoDao) SelectByUserId(userId int64) ([]Video, error) {
 	var videos []Video
@@ -90,4 +97,12 @@ func (*VideoDao) DecrCommentCount(videoId int64) {
 	var video Video
 	db.First(&video, "video_id = ?", videoId)
 	db.Model(&video).Update("comment_count", video.CommentCount-1)
+}
+
+func Feed(last_time time.Time) (video_list *[]Video, err error) {
+	dbErr := db.Where("create_date <= ?", last_time.Format("2006-01-02 15:04:05")).Order("create_date desc").Limit(config.FEEDNUM).Find(&video_list)
+	if dbErr.Error != nil {
+		return nil, dbErr.Error
+	}
+	return video_list, nil
 }
