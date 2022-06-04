@@ -19,7 +19,7 @@ func NewVideoSerVice() *VideoService {
 	return &VideoService{}
 }
 
-func GetVideos(userId int64) ([]repository.Video, int) {
+func GetVideos(userId int64, token string) ([]repository.Video, int) {
 	var videos []repository.Video
 	//拉取视频列表数据（无关注和点赞）
 	videos, err := repository.NewVideoDaoInstance().SelectByUserId(userId)
