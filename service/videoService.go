@@ -19,7 +19,7 @@ func GetVideos(userId int64) ([]repository.Video, int) {
 	return videos, 0
 }
 
-func Addvideos(video repository.Video) {
+func AddVideos(video repository.Video) {
 	err := repository.NewVideoDaoInstance().AddVideo(video)
 	if err != nil {
 		log.Println(err)

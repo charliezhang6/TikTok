@@ -93,7 +93,7 @@ func Publish(c *gin.Context) {
 		FavoriteCount: 0,
 		CommentCount:  0,
 	}
-	service.Addvideos(video)
+	service.AddVideos(video)
 }
 
 // PublishList all users have same publish video list
