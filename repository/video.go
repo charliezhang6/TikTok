@@ -1,10 +1,12 @@
 package repository
 
 import (
+	"TikTok/config"
 	"TikTok/vo"
-	"gorm.io/gorm"
 	"log"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Video struct {
@@ -92,4 +94,12 @@ func (*VideoDao) DecrCommentCount(videoId int64) {
 	var video Video
 	db.First(&video, "video_id = ?", videoId)
 	db.Model(&video).Update("comment_count", video.CommentCount-1)
+}
+
+func Feed(last_time time.Time) (video_list *[]Video, err error) {
+	dbErr := db.Where("create_date <= ?", last_time.Format("2006-01-02 15:04:05")).Order("create_date desc").Limit(config.FEEDNUM).Find(&video_list)
+	if dbErr.Error != nil {
+		return nil, dbErr.Error
+	}
+	return video_list, nil
 }

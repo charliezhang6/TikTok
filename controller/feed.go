@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"TikTok/config"
+	"TikTok/redis"
+	"TikTok/repository"
 	"TikTok/service"
 	"TikTok/vo"
-
-	// "TikTok/service"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,8 +16,8 @@ import (
 
 type FeedResponse struct {
 	vo.Response
-	VideoList []vo.Video `json:"video_list,omitempty"`
-	NextTime  int64      `json:"next_time,omitempty"`
+	VideoList []repository.Video `json:"video_list,omitempty"`
+	NextTime  int64              `json:"next_time,omitempty"`
 }
 
 // Feed same demo video list for every request
@@ -29,6 +31,17 @@ func Feed(c *gin.Context) {
 			StatusMsg: "User doesn't exist"})
 		return
 	}
+
+	var videoUser repository.User
+	err := redis.Get(config.UserKey+token, &videoUser)
+	if err != nil {
+		log.Println("查询redis出错" + err.Error())
+		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		return
+	}
+	user_id = videoUser.ID
+
+	//不存在的时候如何创造匿名对象？
 
 	last_time_query := c.Query("latest_time")
 	if last_time_query == "" || last_time_query == "0" {
@@ -46,58 +59,16 @@ func Feed(c *gin.Context) {
 		latest_time = latestTime
 	}
 
-	videoService, k := service.GetVideos(user_id)
+	videoService := service.NewVideoSerVice()
+	// videoService :=repository.NewVideoDaoInstance()
+	resp, err := videoService.Feed(user_id, latest_time)
 
-	c.JSON(http.StatusOK, FeedResponse{
-		Response:  vo.Response{StatusCode: 0},
-		VideoList: DemoVideos,
-		NextTime:  time.Now().Unix(),
-	})
+	if err != nil {
+		c.JSON(http.StatusOK, vo.Response{
+			StatusCode: 500,
+			StatusMsg:  "刷新视频失败",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, resp)
 }
-
-// // Feed same demo video list for every request
-// func Feed(c *gin.Context) {
-// 	//查询token和要访问的用户
-// 	token := c.Query("token")
-// 	if _, exist := usersLoginInfo[token]; !exist {
-// 		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-// 		return
-// 	}
-
-// 	viodes,err :=service.returnLastvideo()
-
-// 	//查询到访问的用户
-
-// 	if err !=nil{
-// 		c.JSON(http.StatusOK, FeedResponse{
-// 			Response:  vo.Response{StatusCode: -1,StatusMsg: "获取用户信息失败"},
-// 			VideoList: DemoVideos,
-// 			NextTime:  time.Now().Unix(),
-// 		})
-// 	}
-// 	if user==nil{
-// 		c.JSON(http.StatusOK, FeedResponse{
-// 			Response:  vo.Response{StatusCode: 1,StatusMsg: "用户信息有误"},
-// 			VideoList: DemoVideos,
-// 			NextTime:  time.Now().Unix(),
-// 		})
-// 	}
-
-// 	if user !=nil{
-// 		//根据信息
-// 	}
-
-// }
-
-// func returnLastvideo() {
-// 	panic("unimplemented")
-// }
-
-// Feed same demo video list for every request
-// func Feed(c *gin.Context) {
-// 	c.JSON(http.StatusOK, FeedResponse{
-// 		Response:  vo.Response{StatusCode: 0},
-// 		VideoList: DemoVideos,
-// 		NextTime:  time.Now().Unix(),
-// 	})
-// }
