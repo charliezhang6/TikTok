@@ -2,9 +2,9 @@ package repository
 
 import (
 	"TikTok/vo"
-	"log"
-
 	"gorm.io/gorm"
+	"log"
+	"time"
 )
 
 type Video struct {
@@ -16,8 +16,9 @@ type Video struct {
 	FavoriteCount int64   `json:"favorite_count" gorm:"column:favorite_count"`    // 视频的点赞总数
 	CommentCount  int64   `json:"comment_count" gorm:"column:comment_count"`      // 视频的评论总数
 	//结构体变量isfavorite是否点赞等到点赞列表完成后再写
-	IsFavorite bool   `json:"is_favorite" gorm:"column:is_favorite"` // true-已点赞，false-未点赞
-	Title      string `json:"title" gorm:"column:title"`             // 视频标题
+	IsFavorite bool      `json:"is_favorite" gorm:"column:is_favorite"` // true-已点赞，false-未点赞
+	Title      string    `json:"title" gorm:"column:title"`             // 视频标题
+	DateTime   time.Time `json:"time" gorm:"column:date_time"`          // 视频上传时间
 }
 
 type VideoDao struct {
@@ -32,10 +33,14 @@ func NewVideoDaoInstance() *VideoDao {
 	return videoDao
 }
 
-// func (*VideoDao) Addvideo(user User) error {
-
-// 	return nil
-// }
+func (*VideoDao) AddVideo(video Video) error {
+	err := db.Create(&video).Error
+	if err != nil {
+		log.Println("视频添加失败" + err.Error())
+		return err
+	}
+	return nil
+}
 
 func (*VideoDao) SelectByUserId(userId int64) ([]Video, error) {
 	var videos []Video
