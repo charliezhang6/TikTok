@@ -20,7 +20,7 @@ func Register(name string, password string) (int64, string, error) {
 	if err != nil {
 		log.Println(err)
 	}
-	userId := util.GenSonyflake()
+	userId := util.GenSnowflake()
 	user := repository.User{ID: userId, Name: name, Password: string(hashedPassword)}
 	err = repository.NewUserDaoInstance().AddUser(user)
 	if err != nil {
@@ -56,11 +56,10 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 	user, err := repository.NewUserDaoInstance().SelectByName(name)
 	if err != nil {
 		log.Println(err)
-		return 1, nil
-	}
-	if err != nil {
-		log.Println(err)
 		return -1, nil
+	}
+	if user == nil {
+		return 1, nil
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
@@ -70,15 +69,45 @@ func authenticateUser(name string, password string) (int, *repository.User) {
 	return 0, user
 }
 
-func CheckUser(userId int64, token string) (*vo.User, error) {
-	var user vo.User
-	err := redis.Get(config.UserKey+token, &user)
+// CheckUser 检查用户id和token是否正确
+func CheckUser(userId int64, token string) (*repository.User, error) {
+	var user repository.User
+	var err error
+	err = redis.Get(config.UserKey+token, &user)
 	if err != nil {
 		log.Println("查询redis出错" + err.Error())
 		return nil, err
 	}
-	if userId == user.Id {
+	err = RefreshToken(token, &user)
+	if err != nil {
+		log.Println("刷新token失败" + err.Error())
+		return nil, err
+	}
+	if userId == user.ID {
 		return &user, nil
 	}
 	return nil, nil
+}
+
+// SearchUser 通过token查询对应的用户
+func SearchUser(userId int64, token string) (*vo.User, error) {
+	var loginUser repository.User
+	err := redis.Get(config.UserKey+token, &loginUser)
+	if err != nil {
+		log.Println("查询redis出错" + err.Error())
+		return nil, err
+	}
+	err = RefreshToken(token, &loginUser)
+	if err != nil {
+		log.Println("刷新token失败" + err.Error())
+		return nil, err
+	}
+	user, err := repository.NewUserDaoInstance().SelectById(userId)
+	var voUser = vo.User{Id: userId, Name: user.Name, FollowCount: user.FollowCount, FollowerCount: user.FansCount}
+	voUser.IsFollow, err = IsFollow(loginUser.ID, userId)
+	if err != nil {
+		log.Println("判断是否关注出错" + err.Error())
+		return nil, err
+	}
+	return &voUser, nil
 }

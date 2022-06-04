@@ -7,9 +7,11 @@ import (
 )
 
 type User struct {
-	ID       int64  `gorm:"column:user_id"`
-	Name     string `gorm:"column:user_name"`
-	Password string `gorm:"column:user_password"`
+	ID          int64  `gorm:"column:user_id"`
+	Name        string `gorm:"column:user_name"`
+	Password    string `gorm:"column:user_password"`
+	FollowCount int64  `gorm:"column:follow_count"`
+	FansCount   int64  `gorm:"column:fans_count"`
 }
 
 type UserDao struct {
@@ -47,12 +49,37 @@ func (*UserDao) SelectByName(name string) (*User, error) {
 	return &user, err
 }
 
-//func (*UserDao) CountByName(name string) (int64, error) {
-//	var count int64
-//	err := db.Where("user_name = ?", name).Count(&count).Error
-//	if err != nil {
-//		log.Fatal("统计用户出错" + err.Error())
-//	}
-//	return count, err
-//
-//}
+func (*UserDao) SelectById(id int64) (*User, error) {
+	var user User
+	err := db.Where("user_id = ?", id).First(&user).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		log.Println("查找用户出错" + err.Error())
+	}
+	return &user, err
+}
+
+func (*UserDao) AddFollowCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("follow_count", user.FollowCount+1)
+}
+
+func (*UserDao) AddFansCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("fans_count", user.FansCount+1)
+}
+
+func (*UserDao) DecrFollowCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("follow_count", user.FollowCount-1)
+}
+func (*UserDao) DecrFansCountById(id int64) {
+	var user User
+	db.First(&user, "user_id=?", id)
+	db.Model(&user).Update("fans_count", user.FansCount-1)
+}
