@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"TikTok/config"
+	"TikTok/redis"
 	"TikTok/repository"
 	"TikTok/service"
 	"TikTok/vo"
@@ -75,6 +77,22 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	if userId == 0 {
+		var user repository.User
+		err := redis.Get(config.UserKey+token, &user)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, UserResponse{
+				Response: vo.Response{StatusCode: -1, StatusMsg: "获取用户信息失败"},
+			})
+			return
+		} else {
+			c.JSON(http.StatusOK, UserResponse{
+				Response: vo.Response{StatusCode: 0},
+				User:     vo.User{Id: user.ID, Name: user.Name, FollowCount: user.FollowCount, FollowerCount: user.FansCount, IsFollow: false},
+			})
+			return
+		}
+	}
 	user, err := service.SearchUser(userId, token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, UserResponse{
