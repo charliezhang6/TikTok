@@ -26,11 +26,11 @@ func Feed(c *gin.Context) {
 	var user_id int64
 	token := c.Query("token")
 	//用户不存在
-	if _, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, vo.Response{StatusCode: 1,
-			StatusMsg: "User doesn't exist"})
-		return
-	}
+	//if _, exist := usersLoginInfo[token]; !exist {
+	//	c.JSON(http.StatusOK, vo.Response{StatusCode: 1,
+	//		StatusMsg: "User doesn't exist"})
+	//	return
+	//}
 
 	var videoUser repository.User
 	err := redis.Get(config.UserKey+token, &videoUser)
