@@ -4,10 +4,12 @@ import (
 	"TikTok/config"
 	"TikTok/redis"
 	"TikTok/repository"
-	redis2 "github.com/go-redis/redis"
+	"TikTok/vo"
 	"log"
 	"strconv"
 	"time"
+
+	redis2 "github.com/go-redis/redis"
 )
 
 func Favorite(userId int64, videoId int64) (int64, error) {
@@ -42,13 +44,13 @@ func IsFavorite(userId int64, videoId int64) (bool, error) {
 	return result == 1, nil
 }
 
-func GetFavoriteList(userId int64, token string) ([]repository.Video, error) {
+func GetFavoriteList(userId int64, token string) ([]vo.Videoinfo, error) {
 	favorites, err := redis.Client.ZRange(config.FavoriteKey+strconv.FormatInt(userId, 10), 0, -1).Result()
 	if err != nil {
 		log.Println("获取点赞列表失败" + err.Error())
 		return nil, err
 	}
-	videoList := make([]repository.Video, len(favorites))
+	videoList := make([]vo.Videoinfo, len(favorites))
 	for i, favorite := range favorites {
 		var videoId int64
 		videoId, err = strconv.ParseInt(favorite, 10, 64)
@@ -57,6 +59,7 @@ func GetFavoriteList(userId int64, token string) ([]repository.Video, error) {
 			return nil, err
 		}
 		video, err := repository.NewVideoDaoInstance().SelectById(videoId)
+		// video, err := repository.NewVideoDaoInstance().SelectById(1)
 		if err != nil {
 			return nil, err
 		}
@@ -71,7 +74,19 @@ func GetFavoriteList(userId int64, token string) ([]repository.Video, error) {
 			return nil, err
 		}
 		video.IsFavorite, _ = IsFavorite(loginUser.ID, videoId)
-		videoList[i] = video
+		//转化数据结构
+		var videoinfo = &vo.Videoinfo{}
+		videoinfo.Id = video.ID
+		videoinfo.Author.Id = video.UserId
+		videoinfo.Author = video.Author
+		videoinfo.PlayUrl = video.PlayURL
+		videoinfo.CoverUrl = video.CoverURL
+		videoinfo.FavoriteCount = video.FavoriteCount
+		videoinfo.CommentCount = video.CommentCount
+		videoinfo.Title = video.Title
+		videoinfo.IsFavorite, _ = IsFavorite(loginUser.ID, videoId)
+		videoinfo.Author.IsFollow = author.IsFollow
+		videoList[i] = *videoinfo
 	}
 	return videoList, nil
 }

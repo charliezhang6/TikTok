@@ -19,7 +19,7 @@ func NewVideoSerVice() *VideoService {
 	return &VideoService{}
 }
 
-func GetVideos(userId int64, token string) ([]repository.Video, int) {
+func GetVideos(userId int64, token string) ([]vo.Videoinfo, int) {
 	var videos []repository.Video
 	//拉取视频列表数据（无关注和点赞）
 	videos, err := repository.NewVideoDaoInstance().SelectByUserId(userId)
@@ -37,21 +37,33 @@ func GetVideos(userId int64, token string) ([]repository.Video, int) {
 	if err != nil {
 		return nil, 1
 	}
-	for i, videoinfo := range videos {
+	var publishvideos []vo.Videoinfo //返回的发布列表
+	for _, video := range videos {
 		//获取视频ID和作者ID
-		videoId := videoinfo.ID
-		AuthorId := videoinfo.Author.Id
-		//获得视频点赞信息
-		videos[i].IsFavorite, _ = IsFavorite(loginUser.ID, videoId)
+		videoId := video.ID
+		AuthorId := video.Author.Id
+		var videoinfo = &vo.Videoinfo{}
+		videoinfo.Id = video.ID
+		videoinfo.Author.Id = video.UserId
+		videoinfo.Author = video.Author
+		videoinfo.PlayUrl = video.PlayURL
+		videoinfo.CoverUrl = video.CoverURL
+		videoinfo.FavoriteCount = video.FavoriteCount
+		videoinfo.CommentCount = video.CommentCount
+		videoinfo.Title = video.Title
+		//点赞信息
+		videoinfo.IsFavorite, _ = IsFavorite(loginUser.ID, videoId)
+		// videoinfo.IsFavorite = true
 		//获得作者关注信息
 		author, err := SearchUser(AuthorId, token)
 		if err != nil {
 			return nil, 1
 		}
-		videos[i].Author.IsFollow = author.IsFollow
+		videoinfo.Author.IsFollow = author.IsFollow
+		publishvideos = append(publishvideos, *videoinfo)
 	}
 	//返回指定信息
-	return videos, 0
+	return publishvideos, 0
 }
 
 func AddVideos(video repository.Video) {

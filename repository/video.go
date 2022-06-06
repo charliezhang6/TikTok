@@ -46,9 +46,6 @@ func (*VideoDao) AddVideo(video Video) error {
 
 func (*VideoDao) SelectByUserId(userId int64) ([]Video, error) {
 	var videos []Video
-	//注：剩下要解决的bug是没有在video.author的vo.user中加入gorm标签，所以无法把author拉过来，这个之后再改
-	//author拉过来之后是初始值，不是数据库里面的值，问题在哪里呢
-	//要使用preload函数提前加载users，则问题解决
 	err := db.Table("videos").Preload("Author").Joins("inner join users on videos.user_id = users.user_id").Where("videos.user_id = ?", userId).
 		Find(&videos).Error
 	if err == gorm.ErrRecordNotFound {
