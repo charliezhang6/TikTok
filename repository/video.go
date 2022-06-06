@@ -100,7 +100,7 @@ func (*VideoDao) DecrCommentCount(videoId int64) {
 }
 
 func Feed(last_time time.Time) (video_list *[]Video, err error) {
-	dbErr := db.Where("create_date <= ?", last_time.Format("2006-01-02 15:04:05")).Order("create_date desc").Limit(config.FEEDNUM).Find(&video_list)
+	dbErr := db.Where("date_time <= ?", last_time.Format("2006-01-02 15:04:05")).Order("date_time desc").Limit(config.FEEDNUM).Find(&video_list)
 	if dbErr.Error != nil {
 		return nil, dbErr.Error
 	}
