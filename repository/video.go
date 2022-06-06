@@ -18,9 +18,9 @@ type Video struct {
 	FavoriteCount int64   `gorm:"column:favorite_count" json:"favorite_count"`    // 视频的点赞总数
 	CommentCount  int64   `gorm:"column:comment_count" json:"comment_count"`      // 视频的评论总数
 	//结构体变量isfavorite是否点赞等到点赞列表完成后再写
-	IsFavorite bool      `gorm:"-" json:"is_favorite"`         // true-已点赞，false-未点赞
-	Title      string    `gorm:"column:title" json:"title"`    // 视频标题
-	DateTime   time.Time `json:"time" gorm:"column:date_time"` // 视频上传时间
+	IsFavorite bool      `gorm:"-" json:"is_favorite"`      // true-已点赞，false-未点赞
+	Title      string    `gorm:"column:title" json:"title"` // 视频标题
+	DateTime   time.Time `gorm:"column:date_time"`          // 视频上传时间
 }
 
 type VideoDao struct {
