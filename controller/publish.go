@@ -27,7 +27,7 @@ type VideoListResponse struct {
 // GetCover get cover image from video file
 func GetCover(filename string, filepath string) (string, string) {
 	filerealname := strings.Split(filename, ".")
-	filepathname := filepath + "/video/" + filename
+	filepathname := filepath + filename
 	coverpathname := filepath + "/image/" + filerealname[0] + ".jpeg"
 	cmd := exec.Command("ffmpeg", "-i", filepathname, "-ss", "1", "-f", "image2", "-frames:v", "1", coverpathname)
 
@@ -59,7 +59,7 @@ func Publish(c *gin.Context) {
 	}
 
 	// 视频存储路径
-	storePath := "/root/VideoImage"
+	storePath := "/root/VideoImage/video"
 	filename := filepath.Base(data.Filename)
 	finalName := fmt.Sprintf("%d_%s", videoUser.ID, filename)
 	saveFile := filepath.Join(storePath, finalName)
