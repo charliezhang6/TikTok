@@ -24,24 +24,27 @@ type FeedResponse struct {
 func Feed(c *gin.Context) {
 	var latest_time time.Time
 	var user_id int64
+
 	token := c.Query("token")
-	//用户不存在
-	//if _, exist := usersLoginInfo[token]; !exist {
-	//	c.JSON(http.StatusOK, vo.Response{StatusCode: 1,
-	//		StatusMsg: "User doesn't exist"})
-	//	return
-	//}
-
-	var videoUser repository.User
-	err := redis.Get(config.UserKey+token, &videoUser)
-	if err != nil {
-		log.Println("查询redis出错" + err.Error())
-		c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-		return
-	}
-	user_id = videoUser.ID
-
 	//不存在的时候如何创造匿名对象？
+	//用户不存在
+	// if _, exist := usersLoginInfo[token]; !exist {
+	// 	c.JSON(http.StatusOK, vo.Response{StatusCode: 1,
+	// 		StatusMsg: "User doesn't exist"})
+	// 	return
+	// }
+
+	if token != "" {
+		var videoUser repository.User
+		err := redis.Get(config.UserKey+token, &videoUser)
+		//没有用户
+		if err != nil {
+			log.Println("查询redis出错" + err.Error())
+			c.JSON(http.StatusOK, vo.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+			return
+		}
+		user_id = videoUser.ID
+	}
 
 	last_time_query := c.Query("latest_time")
 	if last_time_query == "" || last_time_query == "0" {
