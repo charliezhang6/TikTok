@@ -64,10 +64,10 @@ func Publish(c *gin.Context) {
 	}
 
 	// 视频存储路径
-	storePath := "/root/VideoImage/video"
+	storePath := "/root/VideoImage"
 	filename := filepath.Base(data.Filename)
 	finalName := fmt.Sprintf("%d_%s", videoUser.ID, filename)
-	saveFile := filepath.Join(storePath, finalName)
+	saveFile := filepath.Join(storePath+"/video/", finalName)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, vo.Response{
 			StatusCode: 1,
