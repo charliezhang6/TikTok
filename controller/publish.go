@@ -29,9 +29,14 @@ func GetCover(filename string, filepath string) (string, string) {
 	filerealname := strings.Split(filename, ".")
 	filepathname := filepath + filename
 	coverpathname := filepath + "/image/" + filerealname[0] + ".jpeg"
+	println(filepathname)
+	println(coverpathname)
 	cmd := exec.Command("ffmpeg", "-i", filepathname, "-ss", "1", "-f", "image2", "-frames:v", "1", coverpathname)
 
-	cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		println(err)
+	}
 	return coverpathname, filepathname
 }
 
