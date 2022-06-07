@@ -27,7 +27,7 @@ type VideoListResponse struct {
 // GetCover get cover image from video file
 func GetCover(filename string, filepath string) (string, string) {
 	filerealname := strings.Split(filename, ".")
-	filepathname := filepath + filename
+	filepathname := filepath + "/video/" + filename
 	coverpathname := filepath + "/image/" + filerealname[0] + ".jpeg"
 	println(filepathname)
 	println(coverpathname)
