@@ -37,6 +37,8 @@ func GetCover(filename string, filepath string) (string, string) {
 	if err != nil {
 		println(err)
 	}
+
+	println("after cmd")
 	return coverpathname, filepathname
 }
 
