@@ -19,7 +19,7 @@ func NewVideoSerVice() *VideoService {
 	return &VideoService{}
 }
 
-func GetVideos(userId int64, token string) ([]vo.Videoinfo, int) {
+func GetVideos(userId int64, token string) ([]vo.Video, int) {
 	var videos []repository.Video
 	//拉取视频列表数据（无关注和点赞）
 	videos, err := repository.NewVideoDaoInstance().SelectByUserId(userId)
@@ -37,12 +37,12 @@ func GetVideos(userId int64, token string) ([]vo.Videoinfo, int) {
 	if err != nil {
 		return nil, 1
 	}
-	var publishvideos []vo.Videoinfo //返回的发布列表
+	var publishvideos []vo.Video //返回的发布列表
 	for _, video := range videos {
 		//获取视频ID和作者ID
 		videoId := video.ID
 		AuthorId := video.Author.Id
-		var videoinfo = &vo.Videoinfo{}
+		var videoinfo = &vo.Video{}
 		videoinfo.Id = video.ID
 		videoinfo.Author.Id = video.UserId
 		videoinfo.Author = video.Author
