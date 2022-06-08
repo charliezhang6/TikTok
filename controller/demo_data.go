@@ -1,9 +1,5 @@
 package controller
 
-import (
-	"TikTok/vo"
-)
-
 //var DemoVideos = []vo.Video{
 //	{
 //		Id:            1,
@@ -37,11 +33,11 @@ import (
 //		CreateDate: "05-01",
 //	},
 //}
-
-var DemoUser = vo.User{
-	Id:            1,
-	Name:          "TestUser",
-	FollowCount:   0,
-	FollowerCount: 0,
-	IsFollow:      false,
-}
+//
+//var DemoUser = vo.User{
+//	Id:            1,
+//	Name:          "TestUser",
+//	FollowCount:   0,
+//	FollowerCount: 0,
+//	IsFollow:      false,
+//}
