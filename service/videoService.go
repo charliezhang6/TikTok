@@ -76,6 +76,8 @@ func AddVideos(video repository.Video) {
 	}
 }
 
+//feed 接口service
+
 type FeedResponse struct {
 	vo.Response
 	NextTime  int64               `json:"next_time"`
@@ -86,9 +88,11 @@ func (vs *VideoService) Feed(user_id int64, last_time time.Time) (resp *FeedResp
 	var next_time time.Time
 	var videoList = make([]repository.Video, 0, config.FEEDNUM)
 	videos, err := repository.Feed(last_time)
+
 	if err != nil {
 		return nil, err
 	}
+
 	wg := sync.WaitGroup{}
 	for i, n := 0, len(*videos); i < n; i++ {
 		var videoDao_t = (*videos)[i]
@@ -120,7 +124,7 @@ func (vs *VideoService) Feed(user_id int64, last_time time.Time) (resp *FeedResp
 			video.CoverURL = videoDao.CoverURL
 			video.FavoriteCount = videoDao.FavoriteCount
 			video.CommentCount = videoDao.CommentCount
-			video.IsFavorite = videoDao.IsFavorite
+			// video.IsFavorite = IsFavorite(User_ID, videoId)
 			video.Title = videoDao.Title
 			video.DateTime = videoDao.DateTime
 

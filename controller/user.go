@@ -6,9 +6,10 @@ import (
 	"TikTok/repository"
 	"TikTok/service"
 	"TikTok/vo"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Register(c *gin.Context) {
