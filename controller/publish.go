@@ -21,7 +21,7 @@ import (
 
 type VideoListResponse struct {
 	vo.Response
-	VideoList []vo.Videoinfo `json:"video_list"`
+	VideoList []vo.Video `json:"video_list"`
 }
 
 // GetCover get cover image from video file
