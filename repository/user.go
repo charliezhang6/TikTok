@@ -51,7 +51,7 @@ func (*UserDao) SelectByName(name string) (*User, error) {
 
 func (*UserDao) SelectById(id int64) (*User, error) {
 	var user User
-	err := db.Where("user_id = ?", id).First(&user).Error
+	err := db.First(&user, id).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, nil
 	}
@@ -63,23 +63,23 @@ func (*UserDao) SelectById(id int64) (*User, error) {
 
 func (*UserDao) AddFollowCountById(id int64) {
 	var user User
-	db.First(&user, "user_id=?", id)
+	db.First(&user, id)
 	db.Model(&user).Update("follow_count", user.FollowCount+1)
 }
 
 func (*UserDao) AddFansCountById(id int64) {
 	var user User
-	db.First(&user, "user_id=?", id)
+	db.First(&user, id)
 	db.Model(&user).Update("fans_count", user.FansCount+1)
 }
 
 func (*UserDao) DecrFollowCountById(id int64) {
 	var user User
-	db.First(&user, "user_id=?", id)
+	db.First(&user, id)
 	db.Model(&user).Update("follow_count", user.FollowCount-1)
 }
 func (*UserDao) DecrFansCountById(id int64) {
 	var user User
-	db.First(&user, "user_id=?", id)
+	db.First(&user, id)
 	db.Model(&user).Update("fans_count", user.FansCount-1)
 }
