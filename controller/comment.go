@@ -3,10 +3,11 @@ package controller
 import (
 	"TikTok/service"
 	"TikTok/vo"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type CommentResponse struct {

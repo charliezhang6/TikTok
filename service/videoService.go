@@ -4,12 +4,15 @@ import (
 	"TikTok/config"
 	"TikTok/redis"
 	"TikTok/repository"
+
+	// "TikTok/service"
 	"TikTok/vo"
 	"fmt"
 	"log"
 	"sort"
 	"sync"
 	"time"
+	// "github.com/go-delve/delve/service"
 )
 
 type VideoService struct {
@@ -95,11 +98,32 @@ func (vs *VideoService) Feed(user_id int64, last_time time.Time) (resp *FeedResp
 			var video = &repository.Video{}
 			video.ID = videoDao.ID
 			video.UserId = videoDao.UserId
-			video.Author = videoDao.Author
+			// var Author  vo.User
+			user, err_1 := repository.NewUserDaoInstance().SelectById(videoDao.ID)
+			if err_1 != nil {
+				video.Author = vo.User{
+					Id:            0,
+					Name:          "",
+					FollowCount:   0,
+					FollowerCount: 0,
+					IsFollow:      false,
+				}
+			}
+			video.Author = vo.User{
+				Id:            videoDao.ID,
+				Name:          user.Name,
+				FollowCount:   user.FollowCount,
+				FollowerCount: user.FansCount,
+				IsFollow:      false,
+			}
 			video.PlayURL = videoDao.PlayURL
 			video.CoverURL = videoDao.CoverURL
 			video.FavoriteCount = videoDao.FavoriteCount
 			video.CommentCount = videoDao.CommentCount
+			video.IsFavorite = videoDao.IsFavorite
+			video.Title = videoDao.Title
+			video.DateTime = videoDao.DateTime
+
 			videoList = append(videoList, *video)
 		}(videoDao_t)
 	}
@@ -113,6 +137,7 @@ func (vs *VideoService) Feed(user_id int64, last_time time.Time) (resp *FeedResp
 	sort.Slice(videoList, func(i, j int) bool {
 		return videoList[i].DateTime.After(videoList[j].DateTime)
 	})
+
 	return &FeedResponse{
 		Response: vo.Response{
 			StatusCode: 200,
