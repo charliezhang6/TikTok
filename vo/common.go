@@ -7,6 +7,7 @@ type Response struct {
 
 type Video struct {
 	Id            int64  `json:"id,omitempty"`
+	Title         string `json:"title"`
 	Author        User   `json:"author"`
 	PlayUrl       string `json:"play_url,omitempty"`
 	CoverUrl      string `json:"cover_url,omitempty"`
