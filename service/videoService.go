@@ -103,7 +103,7 @@ func (vs *VideoService) Feed(user_id int64, last_time time.Time) (resp *FeedResp
 			video.ID = videoDao.ID
 			video.UserId = videoDao.UserId
 			// var Author  vo.User
-			user, err_1 := repository.NewUserDaoInstance().SelectById(videoDao.ID)
+			user, err_1 := repository.NewUserDaoInstance().SelectById(videoDao.UserId)
 			if err_1 != nil {
 				video.Author = vo.User{
 					Id:            0,
