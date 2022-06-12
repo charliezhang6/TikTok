@@ -114,7 +114,7 @@ func (vs *VideoService) Feed(user_id int64, last_time time.Time) (resp *FeedResp
 				}
 			}
 			video.Author = vo.User{
-				Id:            videoDao.ID,
+				Id:            videoDao.UserId,
 				Name:          user.Name,
 				FollowCount:   user.FollowCount,
 				FollowerCount: user.FansCount,
