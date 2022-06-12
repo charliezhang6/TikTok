@@ -2,7 +2,7 @@
 Redis:
   Addr: 121.40.150.207
   Port: 6379
-  Password: redis
+  Password:
   DB: 0
 Token:
   # 令牌有效期（默认30分钟
@@ -12,5 +12,5 @@ MySQL:
   Host: 121.40.150.207
   User: root
   Port: 3306
-  Password: root
+  Password:
   DBName: tiktok
